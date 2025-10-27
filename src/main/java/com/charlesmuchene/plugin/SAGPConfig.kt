@@ -1,8 +1,11 @@
-package com.charlesmuchene.plugin.ext
+package com.charlesmuchene.plugin
 
 internal const val EXTENSION_NAME = "swiftConfig"
 
-data class SwiftConfig(
+/**
+ * Swift Android Gradle Plugin configuration class
+ */
+open class SAGPConfig(
     val apiLevel: Int = 28, // Default API level
     val debugAbiFilters: Set<String> = setOf("arm64-v8a"),
     val debugExtraBuildFlags: List<String> = emptyList(),

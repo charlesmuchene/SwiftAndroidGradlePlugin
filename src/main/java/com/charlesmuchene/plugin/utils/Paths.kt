@@ -1,13 +1,13 @@
 package com.charlesmuchene.plugin.utils
 
-import com.charlesmuchene.plugin.ext.EXTENSION_NAME
-import com.charlesmuchene.plugin.ext.SwiftConfig
+import com.charlesmuchene.plugin.EXTENSION_NAME
+import com.charlesmuchene.plugin.SAGPConfig
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 fun swiftSDKPath(project: Project): String {
     // Return custom path
-    (project.extensions.findByName(EXTENSION_NAME) as? SwiftConfig)?.swiftSDKPath?.let { return it }
+    (project.extensions.findByName(EXTENSION_NAME) as? SAGPConfig)?.swiftSDKPath?.let { return it }
 
     // Try to find Swift SDK in common locations
     val homeDir = System.getProperty("user.home")
@@ -30,7 +30,7 @@ fun swiftSDKPath(project: Project): String {
 
 fun swiftlyPath(project: Project): String {
     // Return custom path
-    (project.extensions.findByName(EXTENSION_NAME) as? SwiftConfig)?.swiftlyPath?.let { return it }
+    (project.extensions.findByName(EXTENSION_NAME) as? SAGPConfig)?.swiftlyPath?.let { return it }
 
     // Search swiftly in common locations
     val homeDir = System.getProperty("user.home")
@@ -53,7 +53,7 @@ fun swiftlyPath(project: Project): String {
 }
 
 fun swiftResPath(arch: Arch, project: Project): String {
-    val sdkVersion = (project.extensions.findByName(EXTENSION_NAME) as? SwiftConfig)?.androidSdkVersion
+    val sdkVersion = (project.extensions.findByName(EXTENSION_NAME) as? SAGPConfig)?.androidSdkVersion
         ?: throw GradleException("Missing Android SDK version when evaluating Swift Resources path")
     return "${swiftSDKPath(project)}/swift-${sdkVersion}.artifactbundle/swift-android/swift-resources/usr/lib/swift_static-${arch.swiftArch}/"
 }

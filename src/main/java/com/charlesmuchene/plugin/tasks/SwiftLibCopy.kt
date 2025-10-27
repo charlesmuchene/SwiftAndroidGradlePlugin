@@ -1,7 +1,7 @@
 package com.charlesmuchene.plugin.tasks
 
 import com.charlesmuchene.plugin.utils.Arch
-import com.charlesmuchene.plugin.ext.SwiftConfig
+import com.charlesmuchene.plugin.SAGPConfig
 import com.charlesmuchene.plugin.utils.swiftSDKPath
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Property
@@ -16,7 +16,7 @@ abstract class SwiftLibCopy : Copy() {
     abstract val isDebug: Property<Boolean>
 
     @get:Input
-    abstract val config: Property<SwiftConfig>
+    abstract val config: Property<SAGPConfig>
 
     init {
         val target = arch.get().swiftTarget

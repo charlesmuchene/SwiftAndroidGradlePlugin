@@ -1,7 +1,5 @@
 package com.charlesmuchene.plugin
 
-import com.charlesmuchene.plugin.ext.EXTENSION_NAME
-import com.charlesmuchene.plugin.ext.SwiftConfig
 import com.charlesmuchene.plugin.tasks.SwiftBuild
 import com.charlesmuchene.plugin.tasks.SwiftLibCopy
 import com.charlesmuchene.plugin.utils.Arch
@@ -14,7 +12,7 @@ import org.gradle.api.Project
 class SwiftAndroidGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        val config = project.extensions.create(EXTENSION_NAME, SwiftConfig::class.java)
+        val config = project.extensions.create(EXTENSION_NAME, SAGPConfig::class.java)
         project.afterEvaluate {
             val androidExtension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
@@ -23,7 +21,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
         }
     }
 
-    private fun processAppVariants(androidExtension: Any, config: SwiftConfig, project: Project) {
+    private fun processAppVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
         try {
             val applicationVariantsMethod = androidExtension::class.java.getMethod("getApplicationVariants")
             val variants = applicationVariantsMethod.invoke(androidExtension)
@@ -39,7 +37,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
         }
     }
 
-    private fun processLibVariants(androidExtension: Any, config: SwiftConfig, project: Project) {
+    private fun processLibVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
         try {
             val libraryVariantsMethod = androidExtension::class.java.getMethod("getLibraryVariants")
             val variants = libraryVariantsMethod.invoke(androidExtension)
@@ -56,7 +54,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
     }
 }
 
-private fun handleVariant(variant: Any, config: SwiftConfig, project: Project) {
+private fun handleVariant(variant: Any, config: SAGPConfig, project: Project) {
     val variantClass = variant::class.java
 
     // Get build type and name using reflection
@@ -98,7 +96,7 @@ private fun handleVariant(variant: Any, config: SwiftConfig, project: Project) {
 
 private fun getABIFilters(
     isDebug: Boolean,
-    config: SwiftConfig,
+    config: SAGPConfig,
     buildTypeClass: Class<out Any>,
     buildType: Any?
 ): Set<String> = if (isDebug) {
@@ -120,7 +118,7 @@ private fun createTasks(
     buildTypeName: String,
     project: Project,
     isDebug: Boolean,
-    config: SwiftConfig,
+    config: SAGPConfig,
     variantName: String
 ) {
     val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar { it.uppercaseChar() }}"

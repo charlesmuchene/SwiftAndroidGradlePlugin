@@ -4,6 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "native-lib",
-    products: [.library(name: "native-lib", type: .dynamic, targets: ["native-lib"]) ],
-    targets: [.target(name: "native-lib")]
+    products: [.library(name: "native-lib", type: .dynamic, targets: ["nativelib"]) ],
+    targets: [.target(name: "nativelib")]
 )

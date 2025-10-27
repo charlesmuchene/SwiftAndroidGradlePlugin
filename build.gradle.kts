@@ -1,7 +1,7 @@
 plugins {
-    id("com.gradle.plugin-publish") version "1.3.1"
-    kotlin("jvm") version "2.2.21"
-    id("java-gradle-plugin")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.plugin.publish)
+    alias(libs.plugins.java.gradle.plugin)
 }
 
 group = "com.charlesmuchene"
@@ -14,12 +14,12 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
-    compileOnly("com.android.tools.build:gradle:8.2.0")
-    compileOnly("com.android.tools.build:gradle-api:8.2.0")
+    compileOnly(libs.agp.gradle)
+    compileOnly(libs.agp.gradle.api)
 
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
 }
 
 tasks.test {

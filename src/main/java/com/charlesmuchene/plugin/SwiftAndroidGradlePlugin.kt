@@ -26,7 +26,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            val androidExtension = project.extensions.findByName("android")
+            val extension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
 
             val cleanTask = project.tasks.register("cleanSwift", SwiftClean::class.java) { task ->
@@ -41,50 +41,62 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
 
             // Process variants
             processAppVariants(
-                androidExtension = androidExtension,
+                extension = extension,
                 config = config,
-                project = project
+                project = project,
+                owner = this,
             )
             processLibVariants(
-                androidExtension = androidExtension,
+                extension = extension,
                 config = config,
-                project = project
+                project = project,
+                owner = this
             )
         }
     }
 
+}
 
-    private fun processAppVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
-        try {
-            val applicationVariantsMethod =
-                androidExtension::class.java.getMethod("getApplicationVariants")
-            val variants = applicationVariantsMethod.invoke(androidExtension)
-            val allMethod = variants::class.java.getMethod("all", Closure::class.java)
+private fun processAppVariants(
+    extension: Any,
+    config: SAGPConfig,
+    project: Project,
+    owner: SwiftAndroidGradlePlugin
+) {
+    try {
+        val applicationVariantsMethod =
+            extension::class.java.getMethod("getApplicationVariants")
+        val variants = applicationVariantsMethod.invoke(extension)
+        val allMethod = variants::class.java.getMethod("all", Closure::class.java)
 
-            allMethod.invoke(variants, object : Closure<Unit>(this) {
-                fun doCall(variant: Any) {
-                    handleVariant(variant = variant, config = config, project = project)
-                }
-            })
-        } catch (_: NoSuchMethodException) {
-            /* No applicationVariants found... */
-        }
+        allMethod.invoke(variants, object : Closure<Unit>(owner) {
+            fun doCall(variant: Any) {
+                handleVariant(variant = variant, config = config, project = project)
+            }
+        })
+    } catch (_: NoSuchMethodException) {
+        /* No applicationVariants found... */
     }
+}
 
-    private fun processLibVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
-        try {
-            val libraryVariantsMethod = androidExtension::class.java.getMethod("getLibraryVariants")
-            val variants = libraryVariantsMethod.invoke(androidExtension)
-            val allMethod = variants::class.java.getMethod("all", Closure::class.java)
+private fun processLibVariants(
+    extension: Any,
+    config: SAGPConfig,
+    project: Project,
+    owner: SwiftAndroidGradlePlugin
+) {
+    try {
+        val libraryVariantsMethod = extension::class.java.getMethod("getLibraryVariants")
+        val variants = libraryVariantsMethod.invoke(extension)
+        val allMethod = variants::class.java.getMethod("all", Closure::class.java)
 
-            allMethod.invoke(variants, object : Closure<Unit>(this) {
-                fun doCall(variant: Any) {
-                    handleVariant(variant = variant, config = config, project = project)
-                }
-            })
-        } catch (_: NoSuchMethodException) {
-            /* No libraryVariants found */
-        }
+        allMethod.invoke(variants, object : Closure<Unit>(owner) {
+            fun doCall(variant: Any) {
+                handleVariant(variant = variant, config = config, project = project)
+            }
+        })
+    } catch (_: NoSuchMethodException) {
+        /* No libraryVariants found */
     }
 }
 

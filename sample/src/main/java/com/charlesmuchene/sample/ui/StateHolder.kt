@@ -51,10 +51,12 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
             for (x in 0 until width) {
                 val index = y * width + x
                 val hue = hueArray[index].toFloat()
+                // If inside color is the fixed-inside-color, set brightness to 0.0 for black
+                val brightness = if (hue == 0.0f) 0f else 1.0f
 
                 // HSV to RGB/Color Conversion
                 // We set Saturation and Value (Brightness) to 1.0
-                val color = Color.hsv(hue * 360f, 1.0f, 1.0f)
+                val color = Color.hsv(hue * 360f, 1.0f, brightness)
                 bitmap[x, y] = color.toArgb()
             }
         }

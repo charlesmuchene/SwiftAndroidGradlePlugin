@@ -191,7 +191,7 @@ struct ContinuousColoringStrategy: MandelbrotColoringStrategy {
     let maxIterations: Int
     let colorScaleFactor: Double // Controls the speed of the color change
 
-    init(maxIterations: Int, colorScaleFactor: Double = 10.0) {
+    init(maxIterations: Int, colorScaleFactor: Double = 5.0) {
         self.maxIterations = maxIterations
         self.colorScaleFactor = colorScaleFactor
     }

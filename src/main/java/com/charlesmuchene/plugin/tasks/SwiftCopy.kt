@@ -19,7 +19,7 @@ abstract class SwiftCopy : Copy() {
         val swiftPMBuildPath = "${config.sourcePath}/.build/${target}${apiLevel}/$buildType"
 
         // Copy c++ shared runtime libraries
-        from("${swiftSDKPath(project)}/swift-${config.androidSdkVersion}.artifactbundle/swift-android/ndk-sysroot/usr/lib/${arch.triple}") {
+        from("${swiftSDKPath(project, config)}/swift-${config.androidSdkVersion}.artifactbundle/swift-android/ndk-sysroot/usr/lib/${arch.triple}") {
             include("libc++_shared.so")
         }
 

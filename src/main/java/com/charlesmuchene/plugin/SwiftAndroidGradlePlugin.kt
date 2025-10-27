@@ -155,7 +155,7 @@ private fun createTasks(
     config: SAGPConfig,
     variantName: String
 ) {
-    val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar { it.uppercaseChar() }}"
+    val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar(Char::uppercaseChar)}"
     val swiftBuildTask = project.tasks.register("swiftBuild${taskName}", SwiftBuild::class.java) {
         it.description = "Build $taskName artifacts"
         it.configure(arch = arch, debug = isDebug, config = config)
@@ -167,6 +167,6 @@ private fun createTasks(
     }
 
     // Mount to Android build pipeline - try multiple possible task names
-    val capitalizedVariantName = variantName.replaceFirstChar { it.uppercaseChar() }
+    val capitalizedVariantName = variantName.replaceFirstChar(Char::uppercaseChar)
     project.tasks.findByName("merge${capitalizedVariantName}JniLibFolders")?.dependsOn(copyTask)
 }

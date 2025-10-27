@@ -14,9 +14,11 @@ abstract class SwiftBuild : Exec() {
     }
 
     internal fun configure(arch: Arch, debug: Boolean, config: SAGPConfig) {
-        val swiftlyExecutable = swiftlyPath(project)
-        val resourcesPath = swiftResPath(arch, project)
+        val swiftlyPath = swiftlyPath(project, config)
+        val resourcesPath = swiftResPath(arch, project, config)
+        val swiftVersion = config.swiftVersion
         val sdkName = "${arch.swiftTarget}${config.apiLevel}"
+
         val swiftDir = project.file(config.sourcePath)
         if (!swiftDir.exists()) {
             throw GradleException(
@@ -25,7 +27,6 @@ abstract class SwiftBuild : Exec() {
             )
         }
 
-        val swiftVersion = config.swiftVersion
         val defaultArgs =
             listOf(
                 "run", "+$swiftVersion", "swift", "build",
@@ -39,8 +40,9 @@ abstract class SwiftBuild : Exec() {
             if (debug) config.debugExtraBuildFlags
             else config.releaseExtraBuildFlags
         val arguments = defaultArgs + configurationArgs + extraArgs
+
         workingDir(config.sourcePath)
-        executable(swiftlyExecutable)
-        args(arguments)
+        executable = swiftlyPath
+        args = arguments
     }
 }

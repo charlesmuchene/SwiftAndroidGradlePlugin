@@ -1,4 +1,4 @@
-package com.charlesmuchene.plugin
+package com.charlesmuchene.plugin.providers
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project

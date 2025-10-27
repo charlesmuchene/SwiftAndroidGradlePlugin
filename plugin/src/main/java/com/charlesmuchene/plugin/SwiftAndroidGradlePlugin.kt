@@ -1,5 +1,6 @@
 package com.charlesmuchene.plugin
 
+import com.charlesmuchene.plugin.providers.SwiftSourceSetProvider
 import com.charlesmuchene.plugin.tasks.SwiftBuild
 import com.charlesmuchene.plugin.tasks.SwiftClean
 import com.charlesmuchene.plugin.tasks.SwiftCopy

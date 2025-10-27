@@ -5,4 +5,6 @@ pluginManagement {
     }
 }
 
+include("plugin")
+
 rootProject.name = "swift-android-gradle-plugin"

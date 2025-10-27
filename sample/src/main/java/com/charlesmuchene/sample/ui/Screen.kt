@@ -28,7 +28,7 @@ import com.charlesmuchene.sample.R
 import com.charlesmuchene.sample.ui.theme.SAGPSampleTheme
 
 @Composable
-fun MainScreen(stateHolder: StateHolder = viewModel()) {
+fun MainScreen(stateHolder: StateHolder = viewModel(factory = StateHolder.Factory())) {
     SAGPSampleTheme {
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             TopBar(title = stateHolder.title)

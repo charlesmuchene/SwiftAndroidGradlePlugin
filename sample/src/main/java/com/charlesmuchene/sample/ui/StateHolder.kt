@@ -3,17 +3,22 @@ package com.charlesmuchene.sample.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import com.charlesmuchene.sample.domain.SwiftLibrary
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.charlesmuchene.sample.domain.SwiftLibrary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-class StateHolder : ViewModel() {
+class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
 
     private val swiftLib = SwiftLibrary()
 
@@ -21,10 +26,10 @@ class StateHolder : ViewModel() {
         private set
 
     var image by mutableStateOf<ImageBitmap?>(null)
-    private set
+        private set
 
     init {
-        title = swiftLib.titleFromSwift()
+        viewModelScope.launch(dispatcher) { title = swiftLib.titleFromSwift() }
     }
 
     fun onSizeChanged(size: IntSize) {
@@ -33,9 +38,10 @@ class StateHolder : ViewModel() {
     }
 
     private fun generateFractal(width: Int, height: Int) {
-        // TODO: Send to background thread.
-        val hueArray = swiftLib.generateFractal(width = width, height = height)
-        image = createImage(hueArray = hueArray, width = width, height = height)
+        viewModelScope.launch(dispatcher) {
+            val hueArray = swiftLib.generateFractal(width = width, height = height)
+            image = createImage(hueArray = hueArray, width = width, height = height)
+        }
     }
 
     fun createImage(hueArray: DoubleArray, width: Int, height: Int): ImageBitmap {
@@ -53,5 +59,17 @@ class StateHolder : ViewModel() {
             }
         }
         return bitmap.asImageBitmap()
+    }
+
+    class Factory(private val dispatcher: CoroutineContext = Dispatchers.IO) :
+        ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(StateHolder::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return StateHolder(dispatcher) as T
+            }
+
+            throw IllegalArgumentException("Unknown viewmodel class")
+        }
     }
 }

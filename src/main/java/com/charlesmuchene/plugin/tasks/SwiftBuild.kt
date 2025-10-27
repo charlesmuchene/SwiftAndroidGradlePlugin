@@ -4,34 +4,13 @@ import com.charlesmuchene.plugin.SAGPConfig
 import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.utils.swiftResPath
 import com.charlesmuchene.plugin.utils.swiftlyPath
-import org.gradle.api.Action
 import org.gradle.api.GradleException
-import org.gradle.api.Task
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.Input
 
 abstract class SwiftBuild : Exec() {
-
-    @get:Input
-    abstract val arch: Property<Arch>
-
-    @get:Input
-    abstract val debug: Property<Boolean>
-
-    @get:Input
-    abstract val config: Property<SAGPConfig>
-
-    // Build the SDK name based on architecture
-    private val sdkName by lazy { "${arch.get().swiftTarget}${config.get().apiLevel}" }
-
-    init {
-        executable = swiftlyPath(project)
-    }
-
-    override fun doFirst(action: Action<in Task>): Task {
-        val swiftlyExecutable = executable ?: throw GradleException("Swiftly executable not set")
-        val resourcesPath = swiftResPath(arch.get(), project)
+    internal fun configure(arch: Arch, debug: Boolean, config: SAGPConfig) {
+        val swiftlyExecutable = swiftlyPath(project)
+        val resourcesPath = swiftResPath(arch, project)
 
         // First perform the validation checks
         if (!project.file(swiftlyExecutable).exists() && swiftlyExecutable != "swiftly") {
@@ -48,13 +27,14 @@ abstract class SwiftBuild : Exec() {
         }
 
         logger.lifecycle(
-            "Building Swift for ${arch.get().variantName} ${if (debug.get()) "Debug" else "Release"}"
+            "Building Swift for ${arch.variantName} ${if (debug) "Debug" else "Release"}"
         )
         logger.lifecycle("Using swiftly: $swiftlyExecutable")
+        val sdkName = "${arch.swiftTarget}${config.apiLevel}"
         logger.lifecycle("Swift SDK: $sdkName")
 
         // Set up the build configuration
-        val swiftDir = project.file(config.get().sourcePath)
+        val swiftDir = project.file(config.sourcePath)
         if (!swiftDir.exists()) {
             throw GradleException(
                 "Swift directory not found at: ${swiftDir.absolutePath}\n" +
@@ -62,7 +42,7 @@ abstract class SwiftBuild : Exec() {
             )
         }
 
-        val swiftVersion = config.get().swiftVersion
+        val swiftVersion = config.swiftVersion
         val defaultArgs =
             listOf(
                 "run", "+$swiftVersion", "swift", "build",
@@ -71,14 +51,13 @@ abstract class SwiftBuild : Exec() {
                 "-Xswiftc", "-resource-dir",
                 "-Xswiftc", resourcesPath
             )
-        val configurationArgs = listOf("-c", if (debug.get()) "debug" else "release")
+        val configurationArgs = listOf("-c", if (debug) "debug" else "release")
         val extraArgs =
-            if (debug.get()) config.get().debugExtraBuildFlags
-            else config.get().releaseExtraBuildFlags
+            if (debug) config.debugExtraBuildFlags
+            else config.releaseExtraBuildFlags
         val arguments = defaultArgs + configurationArgs + extraArgs
         workingDir(swiftDir)
         args(arguments)
-
-        return super.doFirst(action)
+        executable(swiftlyExecutable)
     }
 }

@@ -26,15 +26,24 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
         project.afterEvaluate {
             val androidExtension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
-            processAppVariants(androidExtension = androidExtension, config = config, project = project)
-            processLibVariants(androidExtension = androidExtension, config = config, project = project)
+            processAppVariants(
+                androidExtension = androidExtension,
+                config = config,
+                project = project
+            )
+            processLibVariants(
+                androidExtension = androidExtension,
+                config = config,
+                project = project
+            )
         }
     }
 
 
     private fun processAppVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
         try {
-            val applicationVariantsMethod = androidExtension::class.java.getMethod("getApplicationVariants")
+            val applicationVariantsMethod =
+                androidExtension::class.java.getMethod("getApplicationVariants")
             val variants = applicationVariantsMethod.invoke(androidExtension)
             val allMethod = variants::class.java.getMethod("all", Closure::class.java)
 
@@ -134,14 +143,10 @@ private fun createTasks(
 ) {
     val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar { it.uppercaseChar() }}"
     val swiftBuildTask = project.tasks.register("swiftBuild${taskName}", SwiftBuild::class.java) {
-        it.debug.set(isDebug)
-        it.config.set(config)
-        it.arch.set(arch)
+        it.configure(arch, isDebug, config)
     }
     val copyTask = project.tasks.register("copySwift${taskName}", SwiftCopy::class.java) {
-        it.debug.set(isDebug)
-        it.config.set(config)
-        it.arch.set(arch)
+        it.configure(arch, isDebug, config)
         it.dependsOn(swiftBuildTask)
     }
 

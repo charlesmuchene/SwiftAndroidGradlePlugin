@@ -7,6 +7,11 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Copy
 
 abstract class SwiftCopy : Copy() {
+
+    init {
+        group = "swift"
+    }
+
     internal fun configure(arch: Arch, debug: Boolean, config: SAGPConfig) {
         val target = arch.swiftTarget
         val apiLevel = config.apiLevel

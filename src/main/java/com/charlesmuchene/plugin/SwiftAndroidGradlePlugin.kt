@@ -157,9 +157,11 @@ private fun createTasks(
 ) {
     val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar { it.uppercaseChar() }}"
     val swiftBuildTask = project.tasks.register("swiftBuild${taskName}", SwiftBuild::class.java) {
+        it.description = "Build $taskName artifacts"
         it.configure(arch = arch, debug = isDebug, config = config)
     }
-    val copyTask = project.tasks.register("copySwift${taskName}", SwiftCopy::class.java) {
+    val copyTask = project.tasks.register("swiftCopy${taskName}", SwiftCopy::class.java) {
+        it.description = "Copy Swift $taskName artifacts to source set"
         it.configure(arch = arch, debug = isDebug, config = config)
         it.dependsOn(swiftBuildTask)
     }

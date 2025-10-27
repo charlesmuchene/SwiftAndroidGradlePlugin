@@ -8,6 +8,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.Exec
 
 abstract class SwiftBuild : Exec() {
+
+    init {
+        group = "swift"
+    }
+
     internal fun configure(arch: Arch, debug: Boolean, config: SAGPConfig) {
         val swiftlyExecutable = swiftlyPath(project)
         val resourcesPath = swiftResPath(arch, project)

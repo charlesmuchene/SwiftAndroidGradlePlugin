@@ -21,7 +21,7 @@ abstract class SwiftClean : DefaultTask() {
 
     init {
         description = "Cleans Swift build directories"
-        group = "cleanup"
+        group = "swift"
     }
 
     @TaskAction

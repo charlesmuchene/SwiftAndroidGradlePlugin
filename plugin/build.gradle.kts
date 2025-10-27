@@ -7,11 +7,6 @@ plugins {
 group = "com.charlesmuchene"
 version = "0.1.0"
 
-repositories {
-    mavenCentral()
-    google()
-}
-
 dependencies {
     implementation(gradleApi())
     compileOnly(libs.agp.gradle)

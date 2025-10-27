@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "native-lib",
-    products: [.library(name: "native-lib", type: .dynamic, targets: ["nativelib"]) ],
-    targets: [.target(name: "nativelib")]
+    products: [
+        .library(name: "Fractals", targets: ["Fractals"]),
+        .library(name: "native-lib", type: .dynamic, targets: ["nativelib"])
+    ],
+    targets: [.target(name: "nativelib", dependencies: ["Fractals"]), .target(name: "Fractals")]
 )

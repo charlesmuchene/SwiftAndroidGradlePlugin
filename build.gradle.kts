@@ -9,10 +9,13 @@ version = "0.1.0"
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
     implementation(gradleApi())
+    compileOnly("com.android.tools.build:gradle:8.2.0")
+    compileOnly("com.android.tools.build:gradle-api:8.2.0")
 
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

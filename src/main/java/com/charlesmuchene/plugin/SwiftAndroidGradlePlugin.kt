@@ -13,6 +13,16 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val config = project.extensions.create(EXTENSION_NAME, SAGPConfig::class.java)
+
+        // Configure Swift source sets
+        val swiftSourceSetProvider = project.objects.newInstance(SwiftSourceSetProvider::class.java)
+        project.plugins.withId("com.android.application") {
+            swiftSourceSetProvider.configureSourceSet(project)
+        }
+        project.plugins.withId("com.android.library") {
+            swiftSourceSetProvider.configureSourceSet(project)
+        }
+
         project.afterEvaluate {
             val androidExtension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
@@ -20,6 +30,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
             processLibVariants(androidExtension = androidExtension, config = config, project = project)
         }
     }
+
 
     private fun processAppVariants(androidExtension: Any, config: SAGPConfig, project: Project) {
         try {

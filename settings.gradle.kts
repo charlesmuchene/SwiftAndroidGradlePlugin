@@ -9,11 +9,12 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
+    includeBuild("plugin")
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -22,7 +23,6 @@ dependencyResolutionManagement {
     }
 }
 
-include("plugin")
 include("sample")
 
 rootProject.name = "swift-android-gradle-plugin"

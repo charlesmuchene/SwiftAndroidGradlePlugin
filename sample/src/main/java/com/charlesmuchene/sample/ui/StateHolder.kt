@@ -1,6 +1,7 @@
 package com.charlesmuchene.sample.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -13,6 +14,7 @@ import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.charlesmuchene.sample.R
 import com.charlesmuchene.sample.domain.SwiftLibrary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,12 +30,19 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
     var image by mutableStateOf<ImageBitmap?>(null)
         private set
 
+    var placeholderTextId by mutableIntStateOf(R.string.loading_image)
+        private set
+
     init {
         viewModelScope.launch(dispatcher) { title = swiftLib.titleFromSwift() }
     }
 
     fun onSizeChanged(size: IntSize) {
-        if (size.width == 0 || size.height == 0) return
+        if (size.width == 0 || size.height == 0) {
+            placeholderTextId = R.string.no_image
+            return
+        }
+
         generateFractal(width = size.width, height = size.height)
     }
 

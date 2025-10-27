@@ -1,5 +1,6 @@
 package com.charlesmuchene.sample.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,13 +39,20 @@ fun MainScreen(stateHolder: StateHolder = viewModel(factory = StateHolder.Factor
             LaunchedEffect(contentSize) {
                 contentSize?.let(stateHolder::onSizeChanged)
             }
-            Content(bitmap = bitmap, modifier = Modifier.padding(innerPadding)) { contentSize = it }
+
+            Content(
+                bitmap = bitmap,
+                placeholderTextId = stateHolder.placeholderTextId,
+                modifier = Modifier.padding(innerPadding)
+            ) { contentSize = it }
         }
     }
 }
 
 @Composable
 private fun Content(
+    @StringRes
+    placeholderTextId: Int,
     bitmap: ImageBitmap?,
     modifier: Modifier = Modifier,
     onSizeChanged: (IntSize) -> Unit
@@ -57,7 +65,7 @@ private fun Content(
             .onSizeChanged(onSizeChanged),
         contentAlignment = Alignment.Center
     ) {
-        if (bitmap == null) Text(text = stringResource(R.string.missing_image))
+        if (bitmap == null) Text(text = stringResource(placeholderTextId))
         else Image(bitmap = bitmap, contentDescription = stringResource(R.string.fractal))
     }
 }

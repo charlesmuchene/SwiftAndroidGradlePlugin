@@ -123,12 +123,12 @@ private fun createTasks(
 ) {
     val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar { it.uppercaseChar() }}"
     val swiftBuildTask = project.tasks.register("swiftBuild${taskName}", SwiftBuild::class.java) {
-        it.isDebug.set(isDebug)
+        it.debug.set(isDebug)
         it.config.set(config)
         it.arch.set(arch)
     }
     val copyTask = project.tasks.register("copySwift${taskName}", SwiftCopy::class.java) {
-        it.isDebug.set(isDebug)
+        it.debug.set(isDebug)
         it.config.set(config)
         it.arch.set(arch)
         it.dependsOn(swiftBuildTask)

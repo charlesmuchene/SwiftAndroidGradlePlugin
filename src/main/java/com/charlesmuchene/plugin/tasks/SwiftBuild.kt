@@ -17,7 +17,7 @@ abstract class SwiftBuild : Exec() {
     abstract val arch: Property<Arch>
 
     @get:Input
-    abstract val isDebug: Property<Boolean>
+    abstract val debug: Property<Boolean>
 
     @get:Input
     abstract val config: Property<SAGPConfig>
@@ -44,7 +44,7 @@ abstract class SwiftBuild : Exec() {
         }
 
         logger.lifecycle(
-            "Building Swift for ${arch.get().variantName} ${if (isDebug.get()) "Debug" else "Release"}"
+            "Building Swift for ${arch.get().variantName} ${if (debug.get()) "Debug" else "Release"}"
         )
         logger.lifecycle("Using swiftly: $swiftlyPath")
         logger.lifecycle("Swift SDK: $sdkName")
@@ -59,9 +59,9 @@ abstract class SwiftBuild : Exec() {
                 "-Xswiftc", "-resource-dir",
                 "-Xswiftc", resourcesPath
             )
-        val configurationArgs = listOf("-c", if (isDebug.get()) "debug" else "release")
+        val configurationArgs = listOf("-c", if (debug.get()) "debug" else "release")
         val extraArgs =
-            if (isDebug.get()) config.get().debugExtraBuildFlags
+            if (debug.get()) config.get().debugExtraBuildFlags
             else config.get().releaseExtraBuildFlags
         val arguments = defaultArgs + configurationArgs + extraArgs
 

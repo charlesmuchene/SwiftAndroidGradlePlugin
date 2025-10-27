@@ -15,7 +15,7 @@ abstract class SwiftCopy : Copy() {
     abstract val arch: Property<Arch>
 
     @get:Input
-    abstract val isDebug: Property<Boolean>
+    abstract val debug: Property<Boolean>
 
     @get:Input
     abstract val config: Property<SAGPConfig>
@@ -23,7 +23,7 @@ abstract class SwiftCopy : Copy() {
     override fun doFirst(action: Action<in Task>): Task {
         val target = arch.get().swiftTarget
         val apiLevel = config.get().apiLevel
-        val buildType = if (isDebug.get()) "debug" else "release"
+        val buildType = if (debug.get()) "debug" else "release"
         val swiftPMBuildPath = "${config.get().sourcePath}/.build/${target}${apiLevel}/$buildType"
 
         // Copy c++ shared runtime libraries

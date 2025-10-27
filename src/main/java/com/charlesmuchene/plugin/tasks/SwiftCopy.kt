@@ -23,11 +23,15 @@ abstract class SwiftCopy : Copy() {
             include("*.so", "*.so.*")
         })
 
-        into("src/$buildType/jniLibs/${arch.androidAbi}")
+        into("$ROOT_COPY_DIR/$buildType/jniLibs/${arch.androidAbi}")
 
         filePermissions {
             it.unix("0644".toInt(8)) // rw-r--r--
         }
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    companion object {
+        const val ROOT_COPY_DIR = "src"
     }
 }

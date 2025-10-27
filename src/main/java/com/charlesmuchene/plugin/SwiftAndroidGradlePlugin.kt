@@ -1,6 +1,7 @@
 package com.charlesmuchene.plugin
 
 import com.charlesmuchene.plugin.tasks.SwiftBuild
+import com.charlesmuchene.plugin.tasks.SwiftClean
 import com.charlesmuchene.plugin.tasks.SwiftCopy
 import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.utils.architectures
@@ -9,6 +10,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+@Suppress("unused")
 class SwiftAndroidGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
@@ -26,6 +28,18 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
         project.afterEvaluate {
             val androidExtension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
+
+            val cleanTask = project.tasks.register("cleanSwift", SwiftClean::class.java) { task ->
+                task.swiftBuildDirectory.convention(
+                    project.layout.projectDirectory.dir("${config.sourcePath}/.build")
+                )
+            }
+
+            project.tasks.named("clean").configure { task ->
+                task.dependsOn(cleanTask)
+            }
+
+            // Process variants
             processAppVariants(
                 androidExtension = androidExtension,
                 config = config,
@@ -52,8 +66,8 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
                     handleVariant(variant = variant, config = config, project = project)
                 }
             })
-        } catch (e: NoSuchMethodException) {
-            // No applicationVariants found...
+        } catch (_: NoSuchMethodException) {
+            /* No applicationVariants found... */
         }
     }
 
@@ -68,8 +82,8 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
                     handleVariant(variant = variant, config = config, project = project)
                 }
             })
-        } catch (e: NoSuchMethodException) {
-            // No libraryVariants found
+        } catch (_: NoSuchMethodException) {
+            /* No libraryVariants found */
         }
     }
 }
@@ -129,7 +143,7 @@ private fun getABIFilters(
     val getAbiFiltersMethod = ndk::class.java.getMethod("getAbiFilters")
     @Suppress("UNCHECKED_CAST")
     getAbiFiltersMethod.invoke(ndk) as? Set<String> ?: emptySet()
-} catch (e: Exception) {
+} catch (_: Exception) {
     emptySet()
 }
 

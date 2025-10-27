@@ -1,7 +1,7 @@
 package com.charlesmuchene.plugin.tasks
 
-import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.SAGPConfig
+import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.utils.swiftResPath
 import com.charlesmuchene.plugin.utils.swiftlyPath
 import org.gradle.api.Action
@@ -37,14 +37,21 @@ abstract class SwiftBuild : Exec() {
             "-Xswiftc", resourcesPath
         )
         val configurationArgs = listOf("-c", if (isDebug.get()) "debug" else "release")
-        val extraArgs = if (isDebug.get()) config.get().debugExtraBuildFlags else config.get().releaseExtraBuildFlags
+        val extraArgs = if (isDebug.get()) config.get().debugExtraBuildFlags
+        else config.get().releaseExtraBuildFlags
         val arguments = defaultArgs + configurationArgs + extraArgs
 
-        workingDir("src/main/swift")
+        val swiftDir = project.file(config.get().sourcePath)
+        if (!swiftDir.exists()) {
+            throw GradleException(
+                "Swift directory not found at: ${swiftDir.absolutePath}\n" +
+                        "Please create the directory and add your Swift code, or configure a custom path in swiftConfig { sourcePath = \"path/to/swift/code\" }"
+            )
+        }
+
+        workingDir(swiftDir)
         executable(swiftlyPath)
         args(arguments)
-
-        workingDir("src/main/swift")
     }
 
     override fun doFirst(action: Action<in Task>): Task {
@@ -63,7 +70,9 @@ abstract class SwiftBuild : Exec() {
             logger.lifecycle("You may need to install the Swift SDK for Android")
         }
 
-        logger.lifecycle("Building Swift for ${arch.get().variantName} ${if (isDebug.get()) "Debug" else "Release"}")
+        logger.lifecycle(
+            "Building Swift for ${arch.get().variantName} ${if (isDebug.get()) "Debug" else "Release"}"
+        )
         logger.lifecycle("Using swiftly: $swiftlyPath")
         logger.lifecycle("Swift SDK: $sdkName")
         return super.doFirst(action)

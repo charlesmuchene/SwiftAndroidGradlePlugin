@@ -1,10 +1,8 @@
 package com.charlesmuchene.plugin
 
-internal const val EXTENSION_NAME = "swiftConfig"
+internal const val EXTENSION_NAME = "swift"
 
-/**
- * Swift Android Gradle Plugin configuration class
- */
+/** Swift configuration for Android projects */
 open class SAGPConfig(
     val apiLevel: Int = 28, // Default API level
     val debugAbiFilters: Set<String> = setOf("arm64-v8a"),
@@ -13,6 +11,7 @@ open class SAGPConfig(
     val releaseExtraBuildFlags: List<String> = emptyList(),
     val swiftlyPath: String? = null, // Optional custom swiftly path
     val swiftSDKPath: String? = null, // Optional custom Swift SDK path
+    val sourcePath: String = "src/main/swift", // Path to Swift source code
     val swiftVersion: String = "main-snapshot-2025-10-17", // Swift version
     val androidSdkVersion: String = "DEVELOPMENT-SNAPSHOT-2025-10-17-a-android-0.1" // SDK version
 )

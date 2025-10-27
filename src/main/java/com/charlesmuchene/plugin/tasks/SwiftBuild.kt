@@ -25,14 +25,18 @@ abstract class SwiftBuild : Exec() {
     // Build the SDK name based on architecture
     private val sdkName by lazy { "${arch.get().swiftTarget}${config.get().apiLevel}" }
 
+    init {
+        executable = swiftlyPath(project)
+    }
+
     override fun doFirst(action: Action<in Task>): Task {
-        val swiftlyPath = swiftlyPath(project)
+        val swiftlyExecutable = executable ?: throw GradleException("Swiftly executable not set")
         val resourcesPath = swiftResPath(arch.get(), project)
 
         // First perform the validation checks
-        if (!project.file(swiftlyPath).exists() && swiftlyPath != "swiftly") {
+        if (!project.file(swiftlyExecutable).exists() && swiftlyExecutable != "swiftly") {
             throw GradleException(
-                "swiftly not found at: $swiftlyPath\n" +
+                "swiftly not found at: $swiftlyExecutable\n" +
                         "Please install swiftly or configure the path in swiftConfig.swiftlyPath"
             )
         }
@@ -46,10 +50,18 @@ abstract class SwiftBuild : Exec() {
         logger.lifecycle(
             "Building Swift for ${arch.get().variantName} ${if (debug.get()) "Debug" else "Release"}"
         )
-        logger.lifecycle("Using swiftly: $swiftlyPath")
+        logger.lifecycle("Using swiftly: $swiftlyExecutable")
         logger.lifecycle("Swift SDK: $sdkName")
 
         // Set up the build configuration
+        val swiftDir = project.file(config.get().sourcePath)
+        if (!swiftDir.exists()) {
+            throw GradleException(
+                "Swift directory not found at: ${swiftDir.absolutePath}\n" +
+                        "Please create the directory and add your Swift code, or configure a custom path in swiftConfig { sourcePath = \"path/to/swift/code\" }"
+            )
+        }
+
         val swiftVersion = config.get().swiftVersion
         val defaultArgs =
             listOf(
@@ -64,17 +76,7 @@ abstract class SwiftBuild : Exec() {
             if (debug.get()) config.get().debugExtraBuildFlags
             else config.get().releaseExtraBuildFlags
         val arguments = defaultArgs + configurationArgs + extraArgs
-
-        val swiftDir = project.file(config.get().sourcePath)
-        if (!swiftDir.exists()) {
-            throw GradleException(
-                "Swift directory not found at: ${swiftDir.absolutePath}\n" +
-                        "Please create the directory and add your Swift code, or configure a custom path in swiftConfig { sourcePath = \"path/to/swift/code\" }"
-            )
-        }
-
         workingDir(swiftDir)
-        executable(swiftlyPath)
         args(arguments)
 
         return super.doFirst(action)

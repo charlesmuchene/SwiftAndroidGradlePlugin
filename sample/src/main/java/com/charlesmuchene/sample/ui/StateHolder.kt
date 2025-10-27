@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
 
@@ -26,7 +27,12 @@ class StateHolder : ViewModel() {
         title = swiftLib.titleFromSwift()
     }
 
-    fun generateFractal(width: Int, height: Int) {
+    fun onSizeChanged(size: IntSize) {
+        if (size.width == 0 || size.height == 0) return
+        generateFractal(width = size.width, height = size.height)
+    }
+
+    private fun generateFractal(width: Int, height: Int) {
         // TODO: Send to background thread.
         val hueArray = swiftLib.generateFractal(width = width, height = height)
         image = createImage(hueArray = hueArray, width = width, height = height)

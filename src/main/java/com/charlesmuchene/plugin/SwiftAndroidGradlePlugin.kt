@@ -29,15 +29,7 @@ class SwiftAndroidGradlePlugin : Plugin<Project> {
             val extension = project.extensions.findByName("android")
                 ?: throw GradleException("Android extension not found. Make sure to apply this script after the Android plugin.")
 
-            val cleanTask = project.tasks.register("cleanSwift", SwiftClean::class.java) { task ->
-                task.swiftBuildDirectory.convention(
-                    project.layout.projectDirectory.dir("${config.sourcePath}/.build")
-                )
-            }
-
-            project.tasks.named("clean").configure { task ->
-                task.dependsOn(cleanTask)
-            }
+            createCleanTasks(project = project, sourcePath = config.sourcePath)
 
             // Process variants
             processAppVariants(
@@ -181,4 +173,30 @@ private fun createTasks(
     // Mount to Android build pipeline - try multiple possible task names
     val capitalizedVariantName = variantName.replaceFirstChar(Char::uppercaseChar)
     project.tasks.findByName("merge${capitalizedVariantName}JniLibFolders")?.dependsOn(copyTask)
+}
+
+
+private fun createCleanTasks(project: Project, sourcePath: String) {
+    val mainCleanTask = project.tasks.register("cleanSwift", SwiftClean::class.java) { task ->
+        task.directory.convention(
+            project.layout.projectDirectory.dir("$sourcePath/.build")
+        )
+    }
+
+    listOf("Debug", "Release").forEach { buildType ->
+        project.tasks.register("cleanSwift$buildType", SwiftClean::class.java) { task ->
+            with(task) {
+                description = "Clean copied Swift JNI $buildType artifacts"
+                val path = "${SwiftCopy.ROOT_COPY_DIR}/$buildType"
+                directory.convention(project.layout.projectDirectory.dir(path))
+            }
+            mainCleanTask.configure { mainTask ->
+                mainTask.dependsOn(task)
+            }
+        }
+    }
+
+    project.tasks.named("clean").configure { task ->
+        task.dependsOn(mainCleanTask)
+    }
 }

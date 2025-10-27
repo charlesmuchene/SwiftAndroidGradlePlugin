@@ -6,7 +6,9 @@ import com.charlesmuchene.plugin.utils.swiftResPath
 import com.charlesmuchene.plugin.utils.swiftlyPath
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Exec
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Swift build outputs cannot be safely cached")
 abstract class SwiftBuild : Exec() {
 
     init {

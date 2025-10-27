@@ -275,8 +275,8 @@ func prepareDataForJNI(grid: [[Double]]) -> [Double] {
 
 public func generateFractal(width: Int, height: Int) -> [Double] {
     let iterations = 100 // TODO: Set this from other side of bridge
-   // let discreteStrategy = DiscreteColoringStrategy(maxIterations: iterations, bands: 10)
-    let continuousStrategy = ContinuousColoringStrategy(maxIterations: iterations, colorScaleFactor: 8.0)
+   let discreteStrategy = DiscreteColoringStrategy(maxIterations: iterations, bands: 10)
+    // let continuousStrategy = ContinuousColoringStrategy(maxIterations: iterations, colorScaleFactor: 8.0)
    // let insideStrategy = InsideColoringStrategy(maxIterations: iterations)
     let xMin = -2.0
     let xMax = 1.0
@@ -289,7 +289,7 @@ public func generateFractal(width: Int, height: Int) -> [Double] {
         xMax: xMax,
         yMin: yMin,
         yMax: yMax,
-        strategy: continuousStrategy
+        strategy: discreteStrategy
     )
     return prepareDataForJNI(grid: renderedDiscreteGrid)
 }

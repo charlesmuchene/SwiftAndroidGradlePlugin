@@ -159,12 +159,12 @@ private fun createTasks(
     config: SAGPConfig,
     variantName: String
 ) {
-    val taskName = "${arch.variantName}${buildTypeName.replaceFirstChar(Char::uppercaseChar)}"
-    val swiftBuildTask = project.tasks.register("swiftBuild${taskName}", SwiftBuild::class.java) {
+    val taskName = "Swift${arch.variantName}${buildTypeName.replaceFirstChar(Char::uppercaseChar)}"
+    val swiftBuildTask = project.tasks.register("build${taskName}", SwiftBuild::class.java) {
         it.description = "Build $taskName artifacts"
         it.configure(arch = arch, debug = isDebug, config = config)
     }
-    val copyTask = project.tasks.register("swiftCopy${taskName}", SwiftCopy::class.java) {
+    val copyTask = project.tasks.register("copy${taskName}", SwiftCopy::class.java) {
         it.description = "Copy Swift $taskName artifacts to source set"
         it.configure(arch = arch, debug = isDebug, config = config)
         it.dependsOn(swiftBuildTask)
@@ -178,21 +178,22 @@ private fun createTasks(
 
 private fun createCleanTasks(project: Project, sourcePath: String) {
     val mainCleanTask = project.tasks.register("cleanSwift", SwiftClean::class.java) { task ->
+        task.description = "Cleans swift artifacts"
         task.directory.convention(
             project.layout.projectDirectory.dir("$sourcePath/.build")
         )
     }
 
     listOf("Debug", "Release").forEach { buildType ->
-        project.tasks.register("cleanSwift$buildType", SwiftClean::class.java) { task ->
+        val task = project.tasks.register("cleanSwift$buildType", SwiftClean::class.java) { task ->
             with(task) {
                 description = "Clean copied Swift JNI $buildType artifacts"
                 val path = "${SwiftCopy.ROOT_COPY_DIR}/$buildType"
                 directory.convention(project.layout.projectDirectory.dir(path))
             }
-            mainCleanTask.configure { mainTask ->
-                mainTask.dependsOn(task)
-            }
+        }
+        mainCleanTask.configure { clean ->
+            clean.dependsOn(task)
         }
     }
 

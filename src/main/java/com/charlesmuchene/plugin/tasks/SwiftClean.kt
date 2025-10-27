@@ -2,14 +2,12 @@ package com.charlesmuchene.plugin.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 
 abstract class SwiftClean : DefaultTask() {
 
-    @get:InputDirectory
-    @get:Optional
+    @get:InputFiles
     val directory: DirectoryProperty = project.objects.directoryProperty()
 
     init {

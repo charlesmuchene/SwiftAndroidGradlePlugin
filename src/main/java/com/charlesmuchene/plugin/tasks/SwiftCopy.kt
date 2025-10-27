@@ -1,14 +1,16 @@
 package com.charlesmuchene.plugin.tasks
 
-import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.SAGPConfig
+import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.utils.swiftSDKPath
+import org.gradle.api.Action
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Input
 
-abstract class SwiftLibCopy : Copy() {
+abstract class SwiftCopy : Copy() {
     @get:Input
     abstract val arch: Property<Arch>
 
@@ -18,11 +20,11 @@ abstract class SwiftLibCopy : Copy() {
     @get:Input
     abstract val config: Property<SAGPConfig>
 
-    init {
+    override fun doFirst(action: Action<in Task>): Task {
         val target = arch.get().swiftTarget
         val apiLevel = config.get().apiLevel
         val buildType = if (isDebug.get()) "debug" else "release"
-        val swiftPmBuildPath = "src/main/swift/.build/${target}${apiLevel}/$buildType"
+        val swiftPMBuildPath = "${config.get().sourcePath}/.build/${target}${apiLevel}/$buildType"
 
         // Copy c++ shared runtime libraries
         from("${swiftSDKPath(project)}/swift-${config.get().androidSdkVersion}.artifactbundle/swift-android/ndk-sysroot/usr/lib/${arch.get().triple}") {
@@ -30,7 +32,7 @@ abstract class SwiftLibCopy : Copy() {
         }
 
         // Copy built libraries
-        from(project.fileTree(swiftPmBuildPath) {
+        from(project.fileTree(swiftPMBuildPath) {
             include("*.so", "*.so.*")
         })
 
@@ -40,5 +42,7 @@ abstract class SwiftLibCopy : Copy() {
             it.unix("0644".toInt(8)) // rw-r--r--
         }
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+        return super.doFirst(action)
     }
 }

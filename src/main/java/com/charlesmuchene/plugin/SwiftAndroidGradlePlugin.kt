@@ -1,7 +1,7 @@
 package com.charlesmuchene.plugin
 
 import com.charlesmuchene.plugin.tasks.SwiftBuild
-import com.charlesmuchene.plugin.tasks.SwiftLibCopy
+import com.charlesmuchene.plugin.tasks.SwiftCopy
 import com.charlesmuchene.plugin.utils.Arch
 import com.charlesmuchene.plugin.utils.architectures
 import groovy.lang.Closure
@@ -127,7 +127,7 @@ private fun createTasks(
         it.config.set(config)
         it.arch.set(arch)
     }
-    val copyTask = project.tasks.register("copySwift${taskName}", SwiftLibCopy::class.java) {
+    val copyTask = project.tasks.register("copySwift${taskName}", SwiftCopy::class.java) {
         it.isDebug.set(isDebug)
         it.config.set(config)
         it.arch.set(arch)

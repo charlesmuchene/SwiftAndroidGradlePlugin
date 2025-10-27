@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "SwiftAndroidGradlePlugin"
+rootProject.name = "swift-android-gradle-plugin"

@@ -4,7 +4,7 @@ plugins {
     id("java-gradle-plugin")
 }
 
-group = "com.charlesmuchene.swift-android-gradle-plugin"
+group = "com.charlesmuchene"
 version = "0.1.0"
 
 repositories {
@@ -25,9 +25,25 @@ tasks.test {
 
 gradlePlugin {
     plugins {
-        create("SwiftAndroidGradlePlugin") {
+        create("swift-android-gradle-plugin") {
             id = "com.charlesmuchene.swift-android-gradle-plugin"
             implementationClass = "com.charlesmuchene.plugin.SwiftAndroidGradlePlugin"
         }
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+gradlePlugin {
+    website.set("https://github.com/charlesmuchene/SwiftAndroidGradlePlugin")
+    vcsUrl.set("https://github.com/charlesmuchene/SwiftAndroidGradlePlugin.git")
+}
+
+publishing {
+    repositories {
+        mavenLocal()
     }
 }

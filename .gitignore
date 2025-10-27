@@ -413,3 +413,7 @@ hs_err_pid*
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# Swift artifacts
+/sample/src/debug/jniLibs
+/sample/src/release/jniLibs

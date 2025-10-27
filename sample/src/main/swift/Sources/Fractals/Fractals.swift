@@ -4,10 +4,6 @@
 
 import Foundation
 
-public func fractals() -> [String] {
-    ["Native", "lib", "in", "Swift","😎", "Fractals"]
-}
-
 /**
  A complex number a+bi
  */
@@ -268,4 +264,23 @@ func renderMandelbrot(
     }
     
     return finalHueGrid
+}
+
+func prepareDataForJNI(grid: [[Double]]) -> [Double] {
+    // Flatten the 2D grid into a 1D array (row-major order)
+    let flatArray = grid.flatMap { $0 }
+    return flatArray
+}
+
+public func generateFractal(width: Int, height: Int) -> [Double] {
+    let iterations = 100 // TODO: Set this from other side of bridge
+//    let discreteStrategy = DiscreteColoringStrategy(maxIterations: iterations, bands: 10)
+    let continuousStrategy = ContinuousColoringStrategy(maxIterations: iterations, colorScaleFactor: 8.0)
+//    let insideStrategy = InsideColoringStrategy(maxIterations: iterations)
+    let xMin = -2.0
+    let xMax = 1.0
+    let yMin = -1.5
+    let yMax = 1.5
+    let renderedDiscreteGrid = renderMandelbrot(width: width, height: height, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, strategy: continuousStrategy)
+    return prepareDataForJNI(grid: renderedDiscreteGrid)
 }

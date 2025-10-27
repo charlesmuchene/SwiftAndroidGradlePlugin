@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import com.charlesmuchene.sample.ui.theme.SAGPSampleTheme
 
 @Composable
-fun MainScreen(text: String = "Swift Android Gradle Plugin Demo") {
+fun MainScreen(title: String = "Swift Android Gradle Plugin Demo") {
     SAGPSampleTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Content(text = text, modifier = Modifier.padding(innerPadding))
+            Content(text = title, modifier = Modifier.padding(innerPadding))
         }
     }
 }

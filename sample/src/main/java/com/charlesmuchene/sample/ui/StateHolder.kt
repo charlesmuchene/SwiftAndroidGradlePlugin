@@ -16,10 +16,10 @@ class StateHolder : ViewModel() {
 
     private val swiftLib = SwiftLibrary()
 
-    var title by mutableStateOf("")
+    var title by mutableStateOf("Swift Android Gradle Plugin Demo")
         private set
 
-    var fractalImage by mutableStateOf<ImageBitmap?>(null)
+    var image by mutableStateOf<ImageBitmap?>(null)
     private set
 
     init {
@@ -29,7 +29,7 @@ class StateHolder : ViewModel() {
     fun generateFractal(width: Int, height: Int) {
         // TODO: Send to background thread.
         val hueArray = swiftLib.generateFractal(width = width, height = height)
-        fractalImage = createImage(hueArray = hueArray, width = width, height = height)
+        image = createImage(hueArray = hueArray, width = width, height = height)
     }
 
     fun createImage(hueArray: DoubleArray, width: Int, height: Int): ImageBitmap {

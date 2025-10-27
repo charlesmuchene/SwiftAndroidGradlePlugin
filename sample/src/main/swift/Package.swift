@@ -6,7 +6,7 @@ let package = Package(
     name: "native-lib",
     products: [
         .library(name: "Fractals", targets: ["Fractals"]),
-        .library(name: "native-lib", type: .dynamic, targets: ["nativelib"])
+        .library(name: "native-lib", type: .dynamic, targets: ["Lib"])
     ],
-    targets: [.target(name: "nativelib", dependencies: ["Fractals"]), .target(name: "Fractals")]
+    targets: [.target(name: "Lib", dependencies: ["Fractals"]), .target(name: "Fractals")]
 )

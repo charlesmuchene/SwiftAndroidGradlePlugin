@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.charlesmuchene.swift-android-gradle-plugin"
-version = "1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()

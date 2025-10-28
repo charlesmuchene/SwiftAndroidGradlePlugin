@@ -38,7 +38,7 @@ func mandelbrotEscapeCount(
     c: Complex,
     maxIterations: Int,
     escapeRadiusSquared: Double = 4.0
-) -> Double {
+) -> Int {
     var z = Complex(real: 0.0, imag: 0.0)
 
     // The sequence starts with z_0 = 0
@@ -53,7 +53,7 @@ func mandelbrotEscapeCount(
         // Check the escape condition: |z| > 2, which is equivalent to |z|^2 > 4.
         if z.magnitudeSquared > escapeRadiusSquared {
             // The point 'c' has escaped. Return the current iteration count.
-            return Double(iteration + 1) // +1 because we escaped on the (iteration + 1)-th step
+            return iteration + 1 // +1 because we escaped on the (iteration + 1)-th step
         }
 
         iteration += 1
@@ -61,7 +61,7 @@ func mandelbrotEscapeCount(
 
     // The point 'c' did not escape within the maximum number of iterations.
     // This point is likely inside the Mandelbrot set.
-    return Double(maxIterations)
+    return maxIterations
 }
 
 /**
@@ -158,8 +158,8 @@ func generateMandelbrotGrid(
 protocol MandelbrotColoringStrategy {
     var maxIterations: Int { get }
 
-    /// Maps the escape count (Int or Double) to a color index (e.g., Hue: 0.0 to 1.0).
-    func colorIndex(forCount count: Double) -> Double
+    /// Maps the escape count (Int) to a color index (e.g., Hue: 0.0 to 1.0).
+    func colorIndex(forCount count: Int) -> Double
 }
 
 /// Strategy for classic, banded coloring.
@@ -172,17 +172,15 @@ struct DiscreteColoringStrategy: MandelbrotColoringStrategy {
         self.bands = bands
     }
 
-    func colorIndex(forCount count: Double) -> Double {
-        let intCount = Int(count.rounded())
-
+    func colorIndex(forCount count: Int) -> Double {
         // Inside set (did not escape) -> returns 0.0 (Black/Fixed color)
-        if intCount >= maxIterations {
+        if count >= maxIterations {
             return 0.0
         }
 
         // Outside set -> use the modulo operator to cycle through colors
         // The color index cycles from 0.0 to 1.0 based on the bands.
-        return Double(intCount % bands) / Double(bands)
+        return Double(count % bands) / Double(bands)
     }
 }
 
@@ -196,14 +194,14 @@ struct ContinuousColoringStrategy: MandelbrotColoringStrategy {
         self.colorScaleFactor = colorScaleFactor
     }
 
-    func colorIndex(forCount count: Double) -> Double {
+    func colorIndex(forCount count: Int) -> Double {
         // Inside set (did not escape) -> returns 0.0 (Black/Fixed color)
-        if count >= Double(maxIterations) {
+        if count >= maxIterations {
             return 0.0
         }
 
         // Outside set -> apply the smoothing calculation to the count
-        let scaledCount = count * colorScaleFactor
+        let scaledCount = Double(count) * colorScaleFactor
 
         // fmod (floating point modulo) wraps the scaled count between 0.0 and 1.0.
         return fmod(scaledCount, 1.0)
@@ -214,16 +212,14 @@ struct ContinuousColoringStrategy: MandelbrotColoringStrategy {
 struct InsideColoringStrategy: MandelbrotColoringStrategy {
     let maxIterations: Int
 
-    func colorIndex(forCount count: Double) -> Double {
-        let intCount = Int(count.rounded())
-
+    func colorIndex(forCount count: Int) -> Double {
         // Inside set -> Map the final iteration count to a repeating color.
-        if intCount >= maxIterations {
+        if count >= maxIterations {
             let insideBands = 8 // Fewer bands for simplicity
             // Use the maxIterations as a base and map the integer count modulo the bands.
             // (Note: To truly color the inside, you'd need the final Z value,
             // but this uses the count to demonstrate the strategy swap.)
-            return Double(intCount % insideBands) / Double(insideBands)
+            return Double(count % insideBands) / Double(insideBands)
         }
 
         // Outside set -> returns a fixed color (e.g., 0.5 for a blue/green)
@@ -240,25 +236,25 @@ func renderMandelbrot(
     yMax: Double,
     strategy: MandelbrotColoringStrategy
 ) -> [[Double]] {
-    // Note: Since ContinuousColoring requires a Double count, we'll stick to
-    // using mandelbrotSmoothedCount and let the strategy handle rounding if needed.
     let maxIterations = strategy.maxIterations
 
     var finalHueGrid: [[Double]] = Array(repeating: Array(repeating: 0.0, count: width), count: height)
 
     for y in 0..<height {
         for x in 0..<width {
-            let c = mapPixelToComplex(/* ... parameters ... */
-                                      pixelX: x, pixelY: y, width: width, height: height,
-                                      xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax
+            let c = mapPixelToComplex(
+                pixelX: x,
+                pixelY: y,
+                width: width,
+                height: height,
+                xMin: xMin,
+                xMax: xMax,
+                yMin: yMin,
+                yMax: yMax
             )
 
-            // Get the raw (smoothed) escape count
-            let rawCount = mandelbrotEscapeCount(c: c, maxIterations: maxIterations)
-
-            // Pass the count to the chosen strategy to get the final color index
-            let colorHue = strategy.colorIndex(forCount: rawCount)
-
+            let escapeCount = mandelbrotEscapeCount(c: c, maxIterations: maxIterations)
+            let colorHue = strategy.colorIndex(forCount: escapeCount)
             finalHueGrid[y][x] = colorHue
         }
     }
@@ -274,14 +270,14 @@ func prepareDataForJNI(grid: [[Double]]) -> [Double] {
 }
 
 public func generateFractal(width: Int, height: Int) -> [Double] {
-    let iterations = 100 // TODO: Set this from other side of bridge
-   let discreteStrategy = DiscreteColoringStrategy(maxIterations: iterations, bands: 10)
+    let iterations = 500 // TODO: Set this from other side of bridge
+   let discreteStrategy = DiscreteColoringStrategy(maxIterations: iterations, bands: 32)
     // let continuousStrategy = ContinuousColoringStrategy(maxIterations: iterations, colorScaleFactor: 8.0)
    // let insideStrategy = InsideColoringStrategy(maxIterations: iterations)
     let xMin = -2.0
-    let xMax = 1.0
-    let yMin = -1.5
-    let yMax = 1.5
+    let xMax = 2.0
+    let yMin = -2.0
+    let yMax = 2.0
     let renderedDiscreteGrid = renderMandelbrot(
         width: width,
         height: height,

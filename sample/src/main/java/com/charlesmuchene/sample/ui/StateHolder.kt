@@ -43,6 +43,11 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
         viewModelScope.launch(dispatcher) { caption = swiftLib.captionFromSwift() }
     }
 
+    fun reset() {
+        scale = 2.0
+        image = null
+    }
+
     fun generateImage(size: IntSize) {
         if (size.width == 0 || size.height == 0) {
             placeholderTextId = R.string.no_image

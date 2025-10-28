@@ -3,4 +3,5 @@
     <string name="title">Swift Android Gradle Plugin</string>
     <string name="loading_image">Loading image… 😃</string>
     <string name="no_image">No image to display 😔</string>
+    <string name="reset">Reset animation</string>
 </resources>

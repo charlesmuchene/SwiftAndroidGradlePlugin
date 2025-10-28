@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,6 +32,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -40,7 +43,9 @@ import com.charlesmuchene.sample.ui.theme.SAGPSampleTheme
 @Composable
 fun MainScreen(stateHolder: StateHolder = viewModel(factory = StateHolder.Factory())) {
     SAGPSampleTheme {
-        Scaffold(modifier = Modifier.fillMaxSize(), topBar = { TopBar() }) { innerPadding ->
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = { TopBar { stateHolder.reset() } }) { innerPadding ->
             Content(stateHolder = stateHolder, modifier = Modifier.padding(innerPadding))
         }
     }
@@ -121,9 +126,17 @@ private fun animateImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(modifier: Modifier = Modifier) {
+private fun TopBar(modifier: Modifier = Modifier, onReset: () -> Unit) {
     TopAppBar(
         modifier = modifier,
-        title = { Text(text = stringResource(R.string.title)) }
+        title = { Text(text = stringResource(R.string.title)) },
+        actions = {
+            IconButton(onClick = onReset, modifier = Modifier) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_reset),
+                    contentDescription = stringResource(R.string.reset),
+                )
+            }
+        }
     )
 }

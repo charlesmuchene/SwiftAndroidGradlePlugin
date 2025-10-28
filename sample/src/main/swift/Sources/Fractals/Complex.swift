@@ -8,7 +8,7 @@
 /**
  A complex number a+bi
  */
-internal struct Complex {
+internal struct Complex : Sendable {
     var real: Double
     var imag: Double
     

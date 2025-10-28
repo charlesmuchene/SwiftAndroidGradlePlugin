@@ -8,7 +8,7 @@
 import Foundation
 
 /// Protocol for a pluggable coloring strategy.
-protocol MandelbrotColoringStrategy {
+protocol MandelbrotColoringStrategy : Sendable {
     var maxIterations: Int { get }
     
     /// Maps the escape count (Int) to a color index (e.g., Hue: 0.0 to 1.0).

@@ -24,34 +24,46 @@ func generateMandelbrotGrid(
     yMin: Double,
     yMax: Double,
     strategy: MandelbrotColoringStrategy
-) -> [[Double]] {
+) async -> [[Double]] {
     let maxIterations = strategy.maxIterations
-    
+
     var hueGrid: [[Double]] = Array(repeating: Array(repeating: 0.0, count: width), count: height)
-    
-    // Loop through every pixel in the grid (row by row, then column by column)
-    for y in 0..<height {
-        for x in 0..<width {
-            // Map the pixel coordinate (x, y) to a complex number c
-            let c = mapPixelToComplex(
-                pixelX: x,
-                pixelY: y,
-                width: width,
-                height: height,
-                xMin: xMin,
-                xMax: xMax,
-                yMin: yMin,
-                yMax: yMax
-            )
-            
-            // Calculate the escape count for that complex number
-            let count = mandelbrotEscapeCount(c: c, maxIterations: maxIterations)
-            
-            let colorHue = strategy.colorIndex(forCount: count)
-            hueGrid[y][x] = colorHue
+
+    await withTaskGroup(of: (Int, [Double]).self) { group in
+        // Create a concurrent task for each row of pixels.
+        for y in 0..<height {
+            group.addTask { [width, height, xMin, xMax, yMin, yMax, maxIterations, strategy] in
+                var hueRow = Array(repeating: 0.0, count: width)
+                // For each pixel in this row...
+                for x in 0..<width {
+                    // Map the pixel coordinate (x, y) to a complex number 'c'
+                    let c = mapPixelToComplex(
+                        pixelX: x,
+                        pixelY: y,
+                        width: width,
+                        height: height,
+                        xMin: xMin,
+                        xMax: xMax,
+                        yMin: yMin,
+                        yMax: yMax
+                    )
+
+                    // Calculate the escape count for that complex number
+                    let count = mandelbrotEscapeCount(c: c, maxIterations: maxIterations)
+
+                    // Determine the color hue from the escape count
+                    hueRow[x] = strategy.colorIndex(forCount: count)
+                }
+                return (y, hueRow)
+            }
+        }
+
+        // As each task completes, collect the results and place them into hue grid
+        for await (y, row) in group {
+            hueGrid[y] = row
         }
     }
-    
+
     return hueGrid
 }
 
@@ -82,17 +94,17 @@ fileprivate func mapPixelToComplex(
     // Convert pixel coordinates to a normalized value (0.0 to 1.0)
     let normX = Double(pixelX) / Double(width)
     let normY = Double(pixelY) / Double(height) // Note: Pixel Y is usually top-down, which we handle below.
-    
+
     // Map normalized values to the complex number range (Real Part)
     // Real value = xMin + normX * (xMax - xMin)
     let cReal = xMin + normX * (xMax - xMin)
-    
+
     // Map normalized values to the complex number range (Imaginary Part)
     // Note: The y-axis in the complex plane (imaginary) usually increases upwards,
     // while pixel rows (pixelY) typically increase downwards (top to bottom).
     // To correct this, we use (1.0 - normY) to flip the vertical mapping.
     let cImag = yMin + (1.0 - normY) * (yMax - yMin)
-    
+
     return Complex(real: cReal, imag: cImag)
 }
 
@@ -111,25 +123,25 @@ fileprivate func mandelbrotEscapeCount(
     escapeRadiusSquared: Double = 4.0
 ) -> Int {
     var z = Complex(real: 0.0, imag: 0.0)
-    
+
     // The sequence starts with z_0 = 0
     var iteration = 0
-    
+
     while iteration < maxIterations {
         // z_{n+1} = z_n^2 + c
         let zSquared = z.squared()
         z.real = zSquared.real + c.real
         z.imag = zSquared.imag + c.imag
-        
+
         // Check the escape condition: |z| > 2, which is equivalent to |z|^2 > 4.
         if z.magnitudeSquared > escapeRadiusSquared {
             // The point 'c' has escaped. Return the current iteration count.
             return iteration + 1 // +1 because we escaped on the (iteration + 1)-th step
         }
-        
+
         iteration += 1
     }
-    
+
     // The point 'c' did not escape within the maximum number of iterations.
     // This point is likely inside the Mandelbrot set.
     return maxIterations

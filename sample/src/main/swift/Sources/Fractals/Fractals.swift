@@ -23,21 +23,62 @@ public func generateFractal(width: Int, height: Int, scale: Double, cx: Double, 
     let yMin = cy - halfHeight
     let yMax = cy + halfHeight
 
-    let renderedGrid = generateMandelbrotGrid(
-        width: width,
-        height: height,
-        xMin: xMin,
-        xMax: xMax,
-        yMin: yMin,
-        yMax: yMax,
-        strategy: strategy
-    )
-    return prepareDataForJNI(grid: renderedGrid)
+    let resultHolder = ResultHolder()
+    let semaphore = DispatchSemaphore(value: 0)
+
+    Task { [width, height, xMin, xMax, yMin, yMax, strategy] in
+        let renderedGrid = await generateMandelbrotGrid(
+            width: width,
+            height: height,
+            xMin: xMin,
+            xMax: xMax,
+            yMin: yMin,
+            yMax: yMax,
+            strategy: strategy
+        )
+        let data = prepareDataForJNI(grid: renderedGrid)
+
+        await resultHolder.setResult(data)
+
+        semaphore.signal()
+    }
+
+    semaphore.wait()
+
+    return runBlocking {
+        await resultHolder.getValue()
+    } ?? []
+}
+
+fileprivate func runBlocking<T: Sendable>(operation: @escaping @Sendable () async -> T) -> T {
+    let semaphore = DispatchSemaphore(value: 0)
+    var result: T?
+
+    Task {
+        result = await operation()
+        semaphore.signal()
+    }
+
+    semaphore.wait()
+    // We can safely force-unwrap here because the semaphore guarantees `result` is set.
+    return result!
 }
 
 fileprivate func prepareDataForJNI(grid: [[Double]]) -> [Double] {
     // Flatten the 2D grid into a 1D array (row-major order)
     grid.flatMap {
         $0
+    }
+}
+
+actor ResultHolder {
+    var value: [Double]?
+
+    func setResult(_ newValue: [Double]) {
+        self.value = newValue
+    }
+
+    func getValue() -> [Double]? {
+        return self.value
     }
 }

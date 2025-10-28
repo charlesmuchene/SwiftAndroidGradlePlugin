@@ -118,7 +118,7 @@ private fun animateImage(
 
         animatedScale.animateTo(
             targetValue = zoomFactor,
-            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
+            animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         )
         stateHolder.generateNextFractal(width = size.width, height = size.height)
         animatedScale.snapTo(1.0f)

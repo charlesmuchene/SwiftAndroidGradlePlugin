@@ -6,7 +6,7 @@ class SwiftLibrary {
         System.loadLibrary("native-lib")
     }
 
-    external fun titleFromSwift(): String
+    external fun captionFromSwift(): String
 
     /**
      * Generate a fractal image

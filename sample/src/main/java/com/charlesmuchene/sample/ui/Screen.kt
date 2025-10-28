@@ -6,10 +6,14 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -35,16 +40,14 @@ import com.charlesmuchene.sample.ui.theme.SAGPSampleTheme
 @Composable
 fun MainScreen(stateHolder: StateHolder = viewModel(factory = StateHolder.Factory())) {
     SAGPSampleTheme {
-        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            TopBar(title = stateHolder.title)
-        }) { innerPadding ->
-            FractalImage(stateHolder = stateHolder, modifier = Modifier.padding(innerPadding))
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = { TopBar() }) { innerPadding ->
+            Content(stateHolder = stateHolder, modifier = Modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
-private fun FractalImage(stateHolder: StateHolder, modifier: Modifier = Modifier) {
+private fun Content(stateHolder: StateHolder, modifier: Modifier = Modifier) {
     val bitmap = stateHolder.image
     var contentSize by remember { mutableStateOf<IntSize?>(null) }
     LaunchedEffect(contentSize) {
@@ -63,10 +66,25 @@ private fun FractalImage(stateHolder: StateHolder, modifier: Modifier = Modifier
         contentAlignment = Alignment.Center
     ) {
         if (bitmap == null) Text(text = stringResource(stateHolder.placeholderTextId))
-        else Image(
+        else FractalImage(
             bitmap = bitmap,
+            animatedScale = animatedScale,
+            caption = stateHolder.caption
+        )
+    }
+}
+
+@Composable
+private fun FractalImage(
+    bitmap: ImageBitmap,
+    animatedScale: Animatable<Float, AnimationVector1D>,
+    caption: String
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = caption,
             contentScale = ContentScale.Fit,
-            contentDescription = stringResource(R.string.fractal),
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
                 .graphicsLayer {
@@ -74,6 +92,8 @@ private fun FractalImage(stateHolder: StateHolder, modifier: Modifier = Modifier
                     scaleY = animatedScale.value
                 }
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = caption, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -101,9 +121,9 @@ private fun animateImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(title: String, modifier: Modifier = Modifier) {
+private fun TopBar(modifier: Modifier = Modifier) {
     TopAppBar(
         modifier = modifier,
-        title = { Text(text = title) }
+        title = { Text(text = stringResource(R.string.title)) }
     )
 }

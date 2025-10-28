@@ -26,7 +26,7 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
 
     private val swiftLib = SwiftLibrary()
 
-    var title by mutableStateOf("Swift Android Gradle Plugin Demo")
+    var caption by mutableStateOf("Fractals")
         private set
 
     var image by mutableStateOf<ImageBitmap?>(null)
@@ -40,7 +40,7 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
     private var cy = 0.45
 
     init {
-        viewModelScope.launch(dispatcher) { title = swiftLib.titleFromSwift() }
+        viewModelScope.launch(dispatcher) { caption = swiftLib.captionFromSwift() }
     }
 
     fun generateImage(size: IntSize) {

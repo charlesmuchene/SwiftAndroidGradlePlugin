@@ -4,9 +4,9 @@
 import Android
 import Fractals
 
-@_cdecl("Java_com_charlesmuchene_sample_domain_SwiftLibrary_titleFromSwift")
-public func SwiftLibrary_titleFromSwift(env: UnsafeMutablePointer<JNIEnv?>, clazz: jclass) -> jstring {
-    let title = "App title from Swift 😎"
+@_cdecl("Java_com_charlesmuchene_sample_domain_SwiftLibrary_captionFromSwift")
+public func SwiftLibrary_captionFromSwift(env: UnsafeMutablePointer<JNIEnv?>, clazz: jclass) -> jstring {
+    let title = "Mandelbrot Set from Swift 😎"
     return title.withCString { ptr in
         env.pointee!.pointee.NewStringUTF(env, ptr)!
     }

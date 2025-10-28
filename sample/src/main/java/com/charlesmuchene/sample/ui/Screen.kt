@@ -61,12 +61,15 @@ private fun Content(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(8.dp))
             .onSizeChanged(onSizeChanged),
         contentAlignment = Alignment.Center
     ) {
         if (bitmap == null) Text(text = stringResource(placeholderTextId))
-        else Image(bitmap = bitmap, contentDescription = stringResource(R.string.fractal))
+        else Image(
+            bitmap = bitmap,
+            contentDescription = stringResource(R.string.fractal),
+            modifier = Modifier.clip(RoundedCornerShape(16.dp))
+        )
     }
 }
 

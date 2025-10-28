@@ -19,6 +19,7 @@ import com.charlesmuchene.sample.domain.SwiftLibrary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 
 class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
 
@@ -43,7 +44,9 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
             return
         }
 
-        generateFractal(width = size.width, height = size.height)
+        val dimensions = min(size.width, size.height)
+
+        generateFractal(width = dimensions, height = dimensions)
     }
 
     private fun generateFractal(width: Int, height: Int) {
@@ -64,7 +67,6 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
                 val brightness = if (hue == 0.0f) 0f else 1.0f
 
                 // HSV to RGB/Color Conversion
-                // We set Saturation and Value (Brightness) to 1.0
                 val color = Color.hsv(hue * 360f, 1.0f, brightness)
                 bitmap[x, y] = color.toArgb()
             }

@@ -3,7 +3,7 @@ agp = "8.13.0"
 junit = "6.0.0"
 kotlin = "2.2.21"
 pluginPublish = "2.0.0"
-sagp = "0.1.0"
+swiftAgp = "0.1.0-alpha"
 coreKtx = "1.17.0"
 activityCompose = "1.11.0"
 composeBom = "2025.10.01"
@@ -34,4 +34,4 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-swift-android-gradle-plugin = { id = "com.charlesmuchene.swift-android-gradle-plugin", version.ref = "sagp" }
+swift-android-gradle-plugin = { id = "com.charlesmuchene.swift-android-gradle-plugin", version.ref = "swiftAgp" }

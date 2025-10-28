@@ -6,7 +6,7 @@ plugins {
 }
 
 swift {
-    apiLevel = 28
+    apiLevel = 35
 }
 
 android {

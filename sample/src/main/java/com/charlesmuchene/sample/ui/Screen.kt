@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -86,12 +87,14 @@ private fun FractalImage(
     caption: String
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val elevation = 16.dp
         Image(
             bitmap = bitmap,
             contentDescription = caption,
             contentScale = ContentScale.Fit,
             modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
+                .shadow(elevation = elevation)
+                .clip(RoundedCornerShape(elevation))
                 .graphicsLayer {
                     scaleX = animatedScale.value
                     scaleY = animatedScale.value
@@ -128,7 +131,7 @@ private fun animateImage(
 @Composable
 private fun TopBar(modifier: Modifier = Modifier, onReset: () -> Unit) {
     TopAppBar(
-        modifier = modifier,
+        modifier = modifier.shadow(elevation = 4.dp),
         title = { Text(text = stringResource(R.string.title)) },
         actions = {
             IconButton(onClick = onReset, modifier = Modifier) {

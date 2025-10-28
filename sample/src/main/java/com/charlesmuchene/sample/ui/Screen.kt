@@ -1,9 +1,13 @@
 package com.charlesmuchene.sample.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,12 +75,25 @@ private fun Content(stateHolder: StateHolder, modifier: Modifier = Modifier) {
             },
         contentAlignment = Alignment.Center
     ) {
-        if (bitmap == null) Text(text = stringResource(stateHolder.placeholderTextId))
-        else FractalImage(
-            bitmap = bitmap,
-            animatedScale = animatedScale,
-            caption = stateHolder.caption
-        )
+        AnimatedVisibility(
+            visible = bitmap == null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) { Text(text = stringResource(stateHolder.placeholderTextId)) }
+
+        AnimatedVisibility(
+            visible = bitmap != null,
+            enter = fadeIn() + scaleIn(initialScale = 0.8f),
+            exit = fadeOut(),
+        ) {
+            bitmap?.let {
+                FractalImage(
+                    bitmap = it,
+                    animatedScale = animatedScale,
+                    caption = stateHolder.caption
+                )
+            }
+        }
     }
 }
 

@@ -1,6 +1,9 @@
 package com.charlesmuchene.sample.ui
 
-import androidx.annotation.StringRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
@@ -34,43 +38,65 @@ fun MainScreen(stateHolder: StateHolder = viewModel(factory = StateHolder.Factor
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             TopBar(title = stateHolder.title)
         }) { innerPadding ->
-            val bitmap = stateHolder.image
-            var contentSize by remember { mutableStateOf<IntSize?>(null) }
-            LaunchedEffect(contentSize) {
-                contentSize?.let(stateHolder::onSizeChanged)
-            }
-
-            Content(
-                bitmap = bitmap,
-                placeholderTextId = stateHolder.placeholderTextId,
-                modifier = Modifier.padding(innerPadding)
-            ) { contentSize = it }
+            FractalImage(stateHolder = stateHolder, modifier = Modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
-private fun Content(
-    @StringRes
-    placeholderTextId: Int,
-    bitmap: ImageBitmap?,
-    modifier: Modifier = Modifier,
-    onSizeChanged: (IntSize) -> Unit
-) {
+private fun FractalImage(stateHolder: StateHolder, modifier: Modifier = Modifier) {
+    val bitmap = stateHolder.image
+    var contentSize by remember { mutableStateOf<IntSize?>(null) }
+    LaunchedEffect(contentSize) {
+        contentSize?.let(stateHolder::generateImage)
+    }
+
+    val animatedScale = animateImage(contentSize, stateHolder)
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .onSizeChanged(onSizeChanged),
+            .onSizeChanged {
+                contentSize = it
+            },
         contentAlignment = Alignment.Center
     ) {
-        if (bitmap == null) Text(text = stringResource(placeholderTextId))
+        if (bitmap == null) Text(text = stringResource(stateHolder.placeholderTextId))
         else Image(
             bitmap = bitmap,
+            contentScale = ContentScale.Fit,
             contentDescription = stringResource(R.string.fractal),
-            modifier = Modifier.clip(RoundedCornerShape(16.dp))
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .graphicsLayer {
+                    scaleX = animatedScale.value
+                    scaleY = animatedScale.value
+                }
         )
     }
+}
+
+@Composable
+private fun animateImage(
+    size: IntSize?,
+    stateHolder: StateHolder,
+): Animatable<Float, AnimationVector1D> {
+    val zoomFactor = remember { StateHolder.ZOOM_FACTOR.toFloat() }
+    val animatedScale = remember { Animatable(1.0f) }
+
+    LaunchedEffect(stateHolder.image) {
+        if (size == null) return@LaunchedEffect
+
+        animatedScale.animateTo(
+            targetValue = zoomFactor,
+            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
+        )
+        stateHolder.generateNextFractal(width = size.width, height = size.height)
+        animatedScale.snapTo(1.0f)
+    }
+
+    return animatedScale
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

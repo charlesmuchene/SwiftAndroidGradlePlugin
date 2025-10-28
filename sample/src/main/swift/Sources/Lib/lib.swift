@@ -13,8 +13,8 @@ public func SwiftLibrary_titleFromSwift(env: UnsafeMutablePointer<JNIEnv?>, claz
 }
 
 @_cdecl("Java_com_charlesmuchene_sample_domain_SwiftLibrary_generateFractal")
-public func SwiftLibrary_generateFractal(env: UnsafeMutablePointer<JNIEnv?>, clazz: jclass, width: jint, height: jint) -> jdoubleArray {
-    let data = generateFractal(width: Int(width), height: Int(height))
+public func SwiftLibrary_generateFractal(env: UnsafeMutablePointer<JNIEnv?>, clazz: jclass, width: jint, height: jint, scale: jdouble, cx: jdouble, cy: jdouble) -> jdoubleArray {
+    let data = generateFractal(width: Int(width), height: Int(height), scale: Double(scale), cx: Double(cx), cy: Double(cy))
 
     guard let javaArray = env.pointee?.pointee.NewDoubleArray(env, jsize(data.count)) else {
         // Find the `java.lang.OutOfMemoryError` class

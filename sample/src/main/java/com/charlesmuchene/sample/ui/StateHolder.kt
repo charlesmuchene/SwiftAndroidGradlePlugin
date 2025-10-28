@@ -17,7 +17,10 @@ import androidx.lifecycle.viewModelScope
 import com.charlesmuchene.sample.R
 import com.charlesmuchene.sample.domain.SwiftLibrary
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
 
@@ -34,6 +37,11 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
     var placeholderTextId by mutableIntStateOf(R.string.loading_image)
         private set
 
+    // State for zoom and pan
+    private var scale = 2.0
+    private var cx = -0.68
+    private var cy = 0.45
+
     init {
         viewModelScope.launch(dispatcher) { title = swiftLib.titleFromSwift() }
     }
@@ -45,15 +53,24 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
         }
 
         val dimensions = min(size.width, size.height)
-
-        generateFractal(width = dimensions, height = dimensions)
+        viewModelScope.launch {
+            while (isActive) {
+                generateFractal(width = dimensions, height = dimensions)
+                scale *= 0.9
+                delay(50)
+            }
+        }
     }
 
-    private fun generateFractal(width: Int, height: Int) {
-        viewModelScope.launch(dispatcher) {
-            val hueArray = swiftLib.generateFractal(width = width, height = height)
-            image = createImage(hueArray = hueArray, width = width, height = height)
-        }
+    private suspend fun generateFractal(width: Int, height: Int) = withContext(dispatcher) {
+        val hueArray = swiftLib.generateFractal(
+            width = width,
+            height = height,
+            scale = scale,
+            cx = cx,
+            cy = cy
+        )
+        image = createImage(hueArray = hueArray, width = width, height = height)
     }
 
     fun createImage(hueArray: DoubleArray, width: Int, height: Int): ImageBitmap {

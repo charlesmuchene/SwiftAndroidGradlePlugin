@@ -23,7 +23,7 @@ public func generateFractal(width: Int, height: Int, scale: Double, cx: Double, 
     let yMin = cy - halfHeight
     let yMax = cy + halfHeight
 
-    let resultHolder = ResultHolder()
+    let resultHolder = ResultHolder<[Double]>()
     let semaphore = DispatchSemaphore(value: 0)
 
     Task { [width, height, xMin, xMax, yMin, yMax, strategy] in
@@ -46,8 +46,8 @@ public func generateFractal(width: Int, height: Int, scale: Double, cx: Double, 
     semaphore.wait()
 
     return runBlocking {
-        await resultHolder.getValue()
-    } ?? []
+        await resultHolder.getResultOrDefault([])
+    }
 }
 
 fileprivate func runBlocking<T: Sendable>(operation: @escaping @Sendable () async -> T) -> T {
@@ -71,14 +71,18 @@ fileprivate func prepareDataForJNI(grid: [[Double]]) -> [Double] {
     }
 }
 
-actor ResultHolder {
-    var value: [Double]?
+actor ResultHolder<T: Sendable> {
+    var value: T?
 
-    func setResult(_ newValue: [Double]) {
+    func setResult(_ newValue: T) {
         self.value = newValue
     }
 
-    func getValue() -> [Double]? {
-        return self.value
+    func getResult() -> T? {
+        self.value
+    }
+
+    func getResultOrDefault(_ defaultValue: T) -> T {
+        self.getResult() ?? defaultValue
     }
 }

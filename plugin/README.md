@@ -6,6 +6,6 @@ The Swift Android Gradle Plugin performs the heavy lifting for you when building
 plugins {
     // android app/lib plugin must be applied first
     
-    id("com.charlesmuchene.swift-android-gradle-plugin") version "0.1.0"
+    id("com.charlesmuchene.swift-android-gradle-plugin") version "0.1.0-alpha"
 }
 ```

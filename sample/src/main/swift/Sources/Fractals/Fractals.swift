@@ -50,39 +50,9 @@ public func generateFractal(width: Int, height: Int, scale: Double, cx: Double, 
     }
 }
 
-fileprivate func runBlocking<T: Sendable>(operation: @escaping @Sendable () async -> T) -> T {
-    let semaphore = DispatchSemaphore(value: 0)
-    var result: T?
-
-    Task {
-        result = await operation()
-        semaphore.signal()
-    }
-
-    semaphore.wait()
-    // We can safely force-unwrap here because the semaphore guarantees `result` is set.
-    return result!
-}
-
 fileprivate func prepareDataForJNI(grid: [[Double]]) -> [Double] {
     // Flatten the 2D grid into a 1D array (row-major order)
     grid.flatMap {
         $0
-    }
-}
-
-actor ResultHolder<T: Sendable> {
-    var value: T?
-
-    func setResult(_ newValue: T) {
-        self.value = newValue
-    }
-
-    func getResult() -> T? {
-        self.value
-    }
-
-    func getResultOrDefault(_ defaultValue: T) -> T {
-        self.getResult() ?? defaultValue
     }
 }

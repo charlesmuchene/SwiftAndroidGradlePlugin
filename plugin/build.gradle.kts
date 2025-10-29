@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.charlesmuchene"
-version = "0.1.0-alpha"
+version = "0.1.1-alpha"
 
 dependencies {
     implementation(gradleApi())

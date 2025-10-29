@@ -24,6 +24,7 @@ public func generateFractal(width: Int, height: Int, scale: Double, cx: Double, 
     let yMax = cy + halfHeight
 
     let resultHolder = ResultHolder<[Double]>()
+
     let semaphore = DispatchSemaphore(value: 0)
 
     Task { [width, height, xMin, xMax, yMin, yMax, strategy] in

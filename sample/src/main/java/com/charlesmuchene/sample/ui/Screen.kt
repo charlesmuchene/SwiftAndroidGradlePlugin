@@ -61,7 +61,7 @@ private fun Content(stateHolder: StateHolder, modifier: Modifier = Modifier) {
     val bitmap = stateHolder.image
     var contentSize by remember { mutableStateOf<IntSize?>(null) }
     LaunchedEffect(contentSize) {
-        contentSize?.let(stateHolder::generateImage)
+        contentSize?.let(stateHolder::generateInitialFractal)
     }
 
     val animatedScale = animateImage(contentSize, stateHolder)

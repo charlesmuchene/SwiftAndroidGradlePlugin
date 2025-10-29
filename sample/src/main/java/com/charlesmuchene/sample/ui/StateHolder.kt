@@ -48,7 +48,7 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
         image = null
     }
 
-    fun generateImage(size: IntSize) {
+    fun generateInitialFractal(size: IntSize) {
         if (size.width == 0 || size.height == 0) {
             placeholderTextId = R.string.no_image
             return
@@ -71,8 +71,9 @@ class StateHolder(private val dispatcher: CoroutineContext) : ViewModel() {
             cx = cx,
             cy = cy
         )
+        val bitmap = createImage(hueArray = hueArray, width = dimensions, height = dimensions)
         withContext(Dispatchers.Main) {
-            image = createImage(hueArray = hueArray, width = dimensions, height = dimensions)
+            image = bitmap
         }
     }
 

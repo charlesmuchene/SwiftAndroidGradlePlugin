@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// With set generation parallelized, I needed to block waiting for the set to be generated for use at the
-/// JNI layer.
+/// With set generation parallelized, I need to block waiting for the set to be generated for use at the
+/// before returning the result to the JNI layer.
 ///
 /// Here's my attempt at doing so 😃
 ///
@@ -27,7 +27,7 @@ func runBlocking<T: Sendable>(operation: @escaping @Sendable () async -> T) -> T
 }
 
 
-/// This actor in only to convince the compiler that the result can be safely accessed concurrently
+/// This actor is only used to convince the compiler that the result can be safely accessed concurrently
 actor ResultHolder<T: Sendable> {
     var value: T?
     

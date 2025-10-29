@@ -10,10 +10,19 @@ See a [sample app](./sample).
 > Swift SDK for Android is still in alpha: checkout the setup section below on the required toolchain.
 
 ```kotlin
+// build.gradle.kts
 plugins {
-    // apply android app/lib plugin first
+   // android app/lib plugin must be applied first
 
-    id("com.charlesmuchene.swift-android-gradle-plugin") version "0.1.0-alpha"
+   id("com.charlesmuchene.swift-android-gradle-plugin") version "0.1.0-alpha"
+}
+
+// settings.gradle.kts
+pluginManagement {
+   repositories {
+      // other repos, config
+      maven { url = uri("https://jitpack.io") }
+   }
 }
 ```
 

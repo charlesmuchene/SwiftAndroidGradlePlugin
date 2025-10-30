@@ -11,9 +11,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven { url = uri("https://jitpack.io") }
     }
-    includeBuild("plugin")
 }
 
 dependencyResolutionManagement {
@@ -23,7 +21,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-include("sample")
 
 rootProject.name = "swift-android-gradle-plugin"

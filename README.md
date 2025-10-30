@@ -5,7 +5,7 @@
 ## Plugin
 
 The _Swift Android Gradle Plugin_ simplifies the integration of **Swift** libraries into **Android** projects. Building _Swift_ code for _Android_ requires a lot of boilerplate configuration and scripting. This plugin encapsulates all that complexity, providing a simple, opinionated way to build and integrate Swift libraries into your Android app.
-See a [sample app](./sample).
+See a [sample app](https://github.com/charlesmuchene/swift-android-gradle-plugin-sample).
 
 > Swift SDK for Android is still in alpha: checkout the setup section below on the required toolchain.
 
@@ -20,9 +20,12 @@ plugins {
 // settings.gradle.kts
 pluginManagement {
    repositories {
-      // other repos, config
-      maven { url = uri("https://jitpack.io") }
+      // ...
    }
+
+   // NOTE: Plugin is not yet published to any repository
+   // Clone and add plugin as an included build
+   includeBuild("../swift-android-gradle-plugin")
 }
 ```
 
@@ -37,7 +40,7 @@ swift {
 }
 ```
 
-See `SAGPConfig` [file](plugin/src/main/java/com/charlesmuchene/plugin/SAGPConfig.kt) for all available configuration options.
+See `SAGPConfig` [file](src/main/java/com/charlesmuchene/plugin/SAGPConfig.kt) for all available configuration options.
 
 ### Architectures
 
@@ -47,7 +50,7 @@ The plugin supports building for 3 architectures:
 - armeabi-v7a
 - x86_64
 
-To add support for additional architectures, clone plugin and add these to [Arch](./plugin/src/main/java/com/charlesmuchene/plugin/utils/Arch.kt). The plugin can be update to receive a new supported architecture as a configuration.
+To add support for additional architectures, clone plugin and add these to [Arch](./src/main/java/com/charlesmuchene/plugin/utils/Arch.kt). The plugin can be update to receive a new supported architecture as a configuration.
 
 ### Tasks
 
@@ -115,7 +118,7 @@ With the NDK installed:
 
 ## Contact
 
-For questions or support, reach out via [GitHub Issues](https://github.com/charlesmuchene/SwiftAndroidGradlePlugin/issues).
+For questions or support, reach out via [GitHub Issues](https://github.com/charlesmuchene/swift-android-gradle-plugin/issues).
 
 ## Contributing
 
